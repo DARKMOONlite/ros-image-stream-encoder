@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" output="screen"/>
+
+    <node pkg="nodelet" type="nodelet" name="stream_encoder" args="load stream_encoder/StreamEncoderNodelet nodelet_manager" output="screen">
+        <param name="output" value="output.mp4"/>
+    </node>
+
+</launch>

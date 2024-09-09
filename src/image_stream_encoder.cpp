@@ -2,30 +2,33 @@
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <cv_bridge/cv_bridge.h>
+#include <bits/stdc++.h>
 ImageStreamEncoder::ImageStreamEncoder() {
 
     nh = ros::NodeHandle("~");
-
+    rolling_timestamps.resize(10, 0);
     // ------------------------ FILE NAME ------------------------
 
     std::stringstream output_file;
     { // scope block to limit the scope of the time variables
         auto t = std::time(nullptr);
         auto tm = *std::localtime(&t);
-        output_file << std::put_time(&tm, "%Y-%m-%d-%H-%M-%S"); 
+        output_file << std::put_time(&tm, "%Y_%m_%d_%H_%M_%S"); 
     }
     if(!nh.getParam("video_format", video_format)){
-        ROS_WARN("No output_file parameter found, defaulting to .mp4");
+        ROS_WARN("No output_file parameter found, defaulting format to .mp4");
         video_format = ".mp4";
     }
-    if(!nh.getParam("output-prepend", output_prepend)){
-        ROS_INFO("No output-prepend, file name defaulting to %s", output_file.str().c_str());
+    if(!nh.getParam("output_prepend", output_prepend)){
+        ROS_INFO("No output_prepend, file name defaulting to %s", output_file.str().c_str());
         
     }
+    ROS_INFO("test2");
     std::stringstream temp;
     temp << output_prepend << output_file.str() << video_format;
     full_filename = temp.str();
-
+    ROS_INFO("Output file: %s", full_filename.c_str());
     // ------------------------ BATCH PROCESSING ------------------------
 
     if(!nh.getParam("batch", batch_processing_)){
@@ -33,11 +36,14 @@ ImageStreamEncoder::ImageStreamEncoder() {
         batch_processing_ = false;
     }
 
-    if(!nh.getParam("batch-period", batch_period_)){
-        ROS_INFO("No batch-rate parameter found, defaulting to 2 seconds");
+    if(!nh.getParam("batch_period", batch_period_)){
+        ROS_INFO("No batch_period parameter found, defaulting to 2 seconds");
         batch_period_ = 2;
     }
-
+    if(!nh.getParam("input_stream", input_stream_string_)){
+        ROS_WARN("No input_stream parameter found, defaulting to image_stream");
+        input_stream_string_ = "/image_stream";
+    }
 
     // ------------------------- SUBSCRIBER -------------------------
 
@@ -55,28 +61,21 @@ ImageStreamEncoder::ImageStreamEncoder() {
 
     } else {
         ROS_INFO("Batch processing disabled");
-        image_stream = std::make_unique<ros::Subscriber>(nh.subscribe<sensor_msgs::Image>("image_stream", 10, [this](sensor_msgs::Image::ConstPtr image_msg){
+        image_stream = std::make_unique<ros::Subscriber>(nh.subscribe<sensor_msgs::Image>(input_stream_string_, 10, [this](sensor_msgs::Image::ConstPtr image_msg){
             this->image_and_encode(image_msg);
         }));
     }
 
+    
 
 
     // ------------------------ AV LIBRARIES ------------------------
-    ffmpeg_init();
+    ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, AV_CODEC_ID_MPEG4);
 
 }
 
 ImageStreamEncoder::~ImageStreamEncoder() {
-    // Free all allocated resources
-    av_write_trailer(output_format_context);
-    avformat_free_context(output_format_context);
-    delete output_video_stream;
-    
-    
-    avcodec_free_context(&output_codec_context);
-    delete output_codec;
-    delete output_codec_parameters;
+
 }
 
 void ImageStreamEncoder::image_and_encode(sensor_msgs::Image::ConstPtr image_msg) {
@@ -86,84 +85,59 @@ void ImageStreamEncoder::image_and_encode(sensor_msgs::Image::ConstPtr image_msg
 }
 
 void ImageStreamEncoder::image_callback(sensor_msgs::Image::ConstPtr image_msg) {
-    // Callback function for image stream with batching
-    
+    // Merge sec and nsec into a single value
+    double fps = calculate_fps(image_msg->header.stamp);
+    if(frame_count < rolling_timestamps.size()){ // this is to prevent the fps from being calculated before the rolling_timestamps vector is full
+        return;
+    }
+
+    ROS_INFO("Image Callback");
+    if(!ffmpeg_initialized_){
+        if( ! (ffmpeg_initialized_ = ffmpeg_wrapper_->ffmpeg_init(image_msg->width, image_msg->height, static_cast<int>(fps))) ){
+            ROS_ERROR("FFMPEG initialization failed");
+            return;
+        }
+    }
+    ffmpeg_wrapper_->encodeFrame(cv_bridge::toCvCopy(image_msg, sensor_msgs::image_encodings::BGR8)->image);
 }
 /**
  * @brief this will be on a timer and happen every couple of seconds
  * 
  */
-void ImageStreamEncoder::encode_image() {
+void ImageStreamEncoder::encode_image() {// sensor_msgs::Image::ConstPtr image_msg
+    ROS_INFO("Encode Image");
     // Encode image stream
 
 }
 
 
-bool ImageStreamEncoder::ffmpeg_init() {
-    av_register_all();
+/**
+ * @brief 
+ * 
+ * @param header_stamp timestamp from the message header
+ * @return double when this has only been run once, it will return -1
+ */
+double ImageStreamEncoder::calculate_fps(ros::Time header_stamp) {
 
-    avformat_alloc_output_context2(&output_format_context, nullptr, nullptr, full_filename.c_str());
-        if (!output_codec_context) {
-            std::cerr << "Could not create output context\n";
-            ros::shutdown();
-
-    output_codec = avcodec_find_encoder(AV_CODEC_ID_H264);
-    if(!output_codec){
-        ROS_ERROR("Could not find encoder");
-        ros::shutdown();
-    }
-    output_codec_context = avcodec_alloc_context3(output_codec);
-    output_codec_context->width = image_width_;
-    output_codec_context->height = image_height_;
-    output_codec_context->pix_fmt = AV_PIX_FMT_YUV420P;
-    int fps =25;
-    output_codec_context->time_base = (AVRational){1, fps};
-    output_codec_context->framerate = (AVRational){fps, 1};
-
-
-    // Open the codec
-    if(avcodec_open2(output_codec_context, output_codec, nullptr) < 0){
-        ROS_ERROR("Could not open codec");
-        ros::shutdown();
-    }
-    output_video_stream = avformat_new_stream(output_format_context, output_codec);
-    output_video_stream->time_base = output_codec_context->time_base;
-    output_video_stream->codecpar->codec_id = AV_CODEC_ID_H264;
-    output_video_stream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
-    output_video_stream->codecpar->width = image_width_;
-    output_video_stream->codecpar->height = image_height_;
-    output_video_stream->codecpar->format = output_codec_context->pix_fmt;
-
-    // open the file
-    if(!(output_format_context->oformat->flags & AVFMT_NOFILE)){
-        if(avio_open(&output_format_context->pb, full_filename.c_str(), AVIO_FLAG_WRITE) < 0){
-            ROS_ERROR("Could not open file");
-            ros::shutdown();
-        }
-    }
-    // write the header
-    if(avformat_write_header(output_format_context, nullptr) < 0){
-        ROS_ERROR("Could not write header");
-        ros::shutdown();
-    }
-    // allocate the frame
-    if(!batch_processing_){
-        frames.push_back(av_frame_alloc());
-        frames.back()->width = output_codec_context->width;
-        frames.back()->height = output_codec_context->height;
-        frames.back()->format = output_codec_context->pix_fmt;
+    double timestamp = header_stamp.sec + (header_stamp.nsec / 1e9);
+    rolling_timestamps.at(frame_count % rolling_timestamps.size()) = timestamp;
+    frame_count++;
+    double period = (*max_element(rolling_timestamps.begin(), rolling_timestamps.end()) - *min_element(rolling_timestamps.begin(), rolling_timestamps.end()))/rolling_timestamps.size();
+    if(period != 0){
+        ROS_INFO("fps: %f", 1 / period);
+        return(1 / period);
     }
     else{
-        for(int i = 0; i < batch_period_ * fps; i++){
-            frames.push_back(av_frame_alloc());
-            frames.back()->width = output_codec_context->width;
-            frames.back()->height = output_codec_context->height;
-            frames.back()->format = output_codec_context->pix_fmt;
-        }
+        return(-1);
     }
-
-    int buffer_size = av_image_get_buffer_size(output_codec_context->pix_fmt, output_codec_context->width, output_codec_context->height, 1);
-    output_buffer = static_cast<uint8_t*>(av_malloc(buffer_size*sizeof(uint8_t)));
-        av_image_fill_arrays(frames.back()->data, frames.back()->linesize, output_buffer, AV_PIX_FMT_YUV420P, image_width_, image_height_, 1);
-
+    
 }
+
+
+
+int main(int argc, char** argv){
+    ros::init(argc, argv, "image_stream_encoder");
+    ImageStreamEncoder ise;
+    ros::spin();
+}
+

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(image-stream-2-mp4)
+project(image_stream_encoder)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -7,9 +7,26 @@ project(image-stream-2-mp4)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
+find_package(OpenCV REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
+  libavcodec
+  libavformat
+  libavutil
+  libswscale
+  libavdevice
+  libavfilter
+  libavresample
+)
+
+
 find_package(catkin REQUIRED COMPONENTS
   rospy
   roscpp
+  nodelet
+  cv_bridge
 )
 
 ## System dependencies are found with CMake's conventions
@@ -101,9 +118,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES skyy_autoland
-#  CATKIN_DEPENDS rospy
+ INCLUDE_DIRS include
+ LIBRARIES image_stream_encoder image_stream_encoder_nodelet
+ CATKIN_DEPENDS roscpp nodelet
 #  DEPENDS system_lib
 )
 
@@ -118,10 +135,51 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/skyy_autoland.cpp
-# )
+# Declare a C++ library
+add_library(image_stream_encoder
+  src/image_stream_encoder.cpp
+)
+target_include_directories(image_stream_encoder PUBLIC
+  ${OpenCV_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+  include
+)
+target_link_libraries(image_stream_encoder
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBS}
+  PkgConfig::LIBAV
+)
+
+add_library(image_stream_encoder_nodelet
+ include/stream_encoder_nodelet.hpp)
+
+set_target_properties(image_stream_encoder_nodelet PROPERTIES LINKER_LANGUAGE CXX)
+
+ target_include_directories(image_stream_encoder_nodelet PUBLIC
+   ${OpenCV_INCLUDE_DIRS}
+   ${catkin_INCLUDE_DIRS}
+   include
+ )
+  target_link_libraries(image_stream_encoder_nodelet
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    image_stream_encoder
+    PkgConfig::LIBAV
+  )
+
+
+
+  add_executable(image_stream_encoder_node src/image_stream_encoder.cpp)
+  target_include_directories(image_stream_encoder_node PUBLIC
+    ${OpenCV_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
+    include
+  )
+  target_link_libraries(image_stream_encoder_node
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    image_stream_encoder
+  )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
