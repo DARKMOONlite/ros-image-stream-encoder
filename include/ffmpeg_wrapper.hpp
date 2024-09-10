@@ -57,7 +57,7 @@ public:
         codec_context_->width = width_; 
         codec_context_->height = height_;
         codec_context_->pix_fmt = AV_PIX_FMT_YUV420P;
-        codec_context_->time_base =  {1,30000}; //{1, fps_};
+        codec_context_->time_base =  {1,fps_*1000}; //{1, fps_};
         codec_context_->framerate = {fps_, 1};
 
         // ------------------------------------------------ Open codec ------------------------------------------------
