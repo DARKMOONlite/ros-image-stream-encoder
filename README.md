@@ -40,7 +40,7 @@ This Section uses a patched version of FFMpeg created by [jocover](https://githu
     wget https://github.com/jocover/jetson-ffmpeg/raw/master/ffmpeg_nvmpi.patch
     git apply ffmpeg_nvmpi.patch
     ./configure --enable-nvmpi
-    make
+    make -j 4
 ```
 
 ## With NVidea hardware Acceleration on x86_64 (Hasn't been tested fully yet)
