@@ -25,7 +25,9 @@ public:
             exit(1);
         }
 
-        codec_ = avcodec_find_encoder(codec_id);
+        codec_ = avcodec_find_encoder(codec_id); 
+        // codec_ = avcodec_find_encoder_by_name("h264_nvmpi");
+        std::cout << "selected codec id: " << codec_->id << "\n";
         if (!codec_) {
             std::cerr << "H.264 codec not found\n";
             exit(1);
