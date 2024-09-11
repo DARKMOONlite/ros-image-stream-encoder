@@ -14,9 +14,11 @@ class ImageStreamEncoder {
     ImageStreamEncoder();
     ~ImageStreamEncoder();
 
-    void image_and_encode(sensor_msgs::Image::ConstPtr image_msg);
-    void image_callback(sensor_msgs::Image::ConstPtr image_msg);
-    void encode_image(); //sensor_msgs::Image::ConstPtr image_msg
+    void image_and_encode_callback(sensor_msgs::Image::ConstPtr image_msg);
+    bool image_callback(sensor_msgs::Image::ConstPtr image_msg);
+    void timer_callback(const ros::TimerEvent& event);
+    void encode_image(sensor_msgs::Image::ConstPtr image_msg); //sensor_msgs::Image::ConstPtr image_msg
+    void encode_image(std::vector<sensor_msgs::Image::ConstPtr> image_msgs); //sensor_msgs::Image::ConstPtr image_msg
     bool ffmpeg_init();
     double calculate_fps(ros::Time timestamp);
 
@@ -25,6 +27,7 @@ class ImageStreamEncoder {
     private:
     bool batch_processing_ = false, ffmpeg_initialized_ = false;
     double batch_period_ = 2.0;
+    int batch_size_ = 0;
     int image_width_ = 0, image_height_ = 0; // this should be able to be set by the user or gotten by the image stream
 
     ros::NodeHandle nh;
@@ -38,6 +41,9 @@ class ImageStreamEncoder {
     ros::Timer timer; // used for atch processing, not activated if batch processing is not enabled
 
     std::shared_ptr<FFMPEGWrapper> ffmpeg_wrapper_;
+
+
+    std::vector<sensor_msgs::Image::ConstPtr> image_buffer;
 
 };
 
