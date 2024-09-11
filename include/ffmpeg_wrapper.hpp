@@ -68,7 +68,7 @@ public:
 
         // ------------------------------------------- Add stream to output context -------------------------------------------
         AVStream* stream = avformat_new_stream(format_context_, codec_);
-        stream->time_base = {1, fps_};
+        stream->time_base = codec_context_->time_base;
         if(avcodec_parameters_from_context(stream->codecpar, codec_context_) < 0){
             std::cerr << "Could not copy codec parameters to stream\n";
             return(false);
