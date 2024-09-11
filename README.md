@@ -17,7 +17,33 @@ note : *it should work on other ros 1 versions and other linux distros without i
 sudo apt install ffmpeg
 ```
 
-## With NVidea hardware Acceleration
+
+## With NVidea hardware Acceleration on Jetson
+
+This Section uses a patched version of FFMpeg created by [jocover](https://github.com/jocover) and can be found at the [**jetson ffmpeg repo**](https://github.com/jocover/jetson-ffmpeg)
+
+1.build and install library
+```bash
+    git clone https://github.com/jocover/jetson-ffmpeg.git
+    cd jetson-ffmpeg
+    mkdir build
+    cd build
+    cmake ..
+    make
+    sudo make install
+    sudo ldconfig
+```
+2.patch ffmpeg and build
+```bash
+    git clone git://source.ffmpeg.org/ffmpeg.git -b release/4.2 --depth=1
+    cd ffmpeg
+    wget https://github.com/jocover/jetson-ffmpeg/raw/master/ffmpeg_nvmpi.patch
+    git apply ffmpeg_nvmpi.patch
+    ./configure --enable-nvmpi
+    make -j 4
+```
+
+## With NVidea hardware Acceleration on x86_64 (Hasn't been tested fully yet)
 
 to improve encoding speed on a device with a dedicated nvidia gpu, you can build the FFMpeg library with the nvidia codecies
 1. clone and build `ffnvcodec`
