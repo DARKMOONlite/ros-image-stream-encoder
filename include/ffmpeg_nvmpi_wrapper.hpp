@@ -57,7 +57,7 @@
             }
             std::cout << "end encodeFrame\n";
 
-            AVPacket av_packet = nv_to_av_packet(&packet);
+            AVPacket av_packet;// = nv_to_av_packet(&packet);
 
             if(av_interleaved_write_frame(format_context_, &av_packet)){
                 std::cerr << "Error writing frame to file\n";

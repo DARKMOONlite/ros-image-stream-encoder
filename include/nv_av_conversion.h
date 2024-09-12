@@ -16,20 +16,20 @@ extern "C"{ // this links to the C library
 
 
 
-    nvPacket av_to_nv_packet(AVPacket* av_packet){
-        nvPacket nv_packet;
-        nv_packet.payload_size = av_packet->size;
-        nv_packet.payload = &av_packet->data;
-        nv_packet.pts = av_packet->pts;
-        return nv_packet;
-    }
+    // nvPacket av_to_nv_packet(AVPacket* av_packet){
+    //     nvPacket nv_packet;
+    //     nv_packet.payload_size = av_packet->size;
+    //     nv_packet.payload = &av_packet->data;
+    //     nv_packet.pts = av_packet->pts;
+    //     return nv_packet;
+    // }
 
-    AVPacket nv_to_av_packet(nvPacket* nv_packet){
-        AVPacket av_packet;
-        av_packet.size = nv_packet->payload_size;
-        av_packet.data = &nv_packet->payload;
-        return av_packet;
-    }
+    // AVPacket nv_to_av_packet(nvPacket* nv_packet){
+    //     AVPacket av_packet;
+    //     av_packet.size = nv_packet->payload_size;
+    //     av_packet.data = &nv_packet->payload;
+    //     return av_packet;
+    // }
 
     // AVFrame nv_to_av_frame(nvFrame* nv_frame){
 
