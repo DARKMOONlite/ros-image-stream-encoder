@@ -57,13 +57,4 @@ target_include_directories(nvmpi PRIVATE /usr/src/jetson_multimedia_api/include)
 target_include_directories(nvmpi PRIVATE /usr/local/cuda/include)
 target_include_directories(nvmpi_static PRIVATE /usr/src/jetson_multimedia_api/include)
 target_include_directories(nvmpi_static PRIVATE /usr/local/cuda/include)
-configure_file(nvmpi.pc.in nvmpi.pc @ONLY)
-include(GNUInstallDirs)
-install(TARGETS nvmpi nvmpi_static
-	    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES ${CMAKE_BINARY_DIR}/nvmpi.pc
-	    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
-install(FILES ${CMAKE_BINARY_DIR}/nvmpi.pc
-	    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
