@@ -177,6 +177,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aar
   add_definitions(-DJETSON_PLATFORM)
 
   add_library(nvmpi_wrapper
+    lib/nvmpi/nvmpi.h
     lib/nvmpi/nvmpi_enc.cpp
     lib/nvmpi/nvmpi_dec.cpp)
 
