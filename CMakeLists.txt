@@ -2,12 +2,6 @@ cmake_minimum_required(VERSION 3.0.2)
 project(image_stream_encoder)
 
 
-set(CMAKE_C_FLAGS“$ {CMAKE_C_FLAGS} -fPIC”)
-set(CMAKE_CXX_FLAGS“$ {CMAKE_CXX_FLAGS} -fPIC”)
-#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link=/lib")
-#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link=/usr/lib/aarch64-linux-gnu")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link=/usr/lib/aarch64-linux-gnu/tegra")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link=/usr/local/cuda/lib64")
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
@@ -28,6 +22,7 @@ pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
   libavresample
 )
 
+message(STATUS "LIBAV includes: ${LIBAV_INCLUDE_DIRS}")
 
 find_package(catkin REQUIRED COMPONENTS
   rospy

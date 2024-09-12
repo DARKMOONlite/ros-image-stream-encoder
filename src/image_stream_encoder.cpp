@@ -77,12 +77,13 @@ ImageStreamEncoder::ImageStreamEncoder() {
 
 
     // ------------------------ AV LIBRARIES ------------------------
-    
-    #ifdef JETSON_PLATFORM
-        ffmpeg_wrapper_ = std::make_shared<FFMPEGNVMPIWrapper>(full_filename, AV_CODEC_ID_H264);
-    #else
-        ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, AV_CODEC_ID_H264);
-    #endif
+    ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, AV_CODEC_ID_H264);
+
+    // #ifdef JETSON_PLATFORM
+    //     ffmpeg_wrapper_ = std::make_shared<FFMPEGNVMPIWrapper>(full_filename, AV_CODEC_ID_H264);
+    // #else
+    //     ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, AV_CODEC_ID_H264);
+    // #endif
 }
 
 ImageStreamEncoder::~ImageStreamEncoder() {
