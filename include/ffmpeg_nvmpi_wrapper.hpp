@@ -1,7 +1,7 @@
 #ifndef FFMPEG_NVMPI_WRAPPER_H
 #define FFMPEG_NVMPI_WRAPPER_H
 
-#ifdef JETSON_PLATFORM
+#ifdef JETSON_PLATFORM // this is defined in the CMakeLists.txt file and thus only runs if the code is being compiled on a Jetson platform
 
 
 #include "nvmpi.h"
@@ -17,6 +17,7 @@
 
         FFMPEGNVMPIWrapper(const std::string& filename, AVCodecID codec_id):FFMPEGWrapper(filename,codec_id) {
             coding_type_ = convertCodecID(codec_id);
+            std::cout << "constructing FFMpeg object with NVMPI headers \n";
         }
         ~FFMPEGNVMPIWrapper(){
             nvmpi_encoder_close(nvmpi_ctx_);
@@ -40,10 +41,14 @@
             frame.payload[0] = image.data;
             frame.linesize[0] = image.cols * 3;
 
-            nvmpi_encoder_put_frame(nvmpi_ctx_,&frame);
+            if(nvmpi_encoder_put_frame(nvmpi_ctx_,&frame) < 0){
+                std::cerr << "Error encoding frame\n";
+            }
 
             nvPacket packet;
-            nvmpi_encoder_get_packet(nvmpi_ctx_,&packet);
+            if(nvmpi_encoder_get_packet(nvmpi_ctx_,&packet) < 0){
+                std::cerr << "Error getting packet\n";
+            }
 
         }
 
