@@ -77,7 +77,7 @@ ImageStreamEncoder::ImageStreamEncoder() {
 
 
     // ------------------------ AV LIBRARIES ------------------------
-    ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, AV_CODEC_ID_MPEG4);
+    ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, AV_CODEC_ID_H264);
 
 }
 
