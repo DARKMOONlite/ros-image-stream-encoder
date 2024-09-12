@@ -6,7 +6,7 @@
 
 #include "nvmpi.h"
 #include <ffmpeg_wrapper.hpp>
-
+#include "nv_av_conversion.h"
     /**
      * @brief This class completely overrides the regular FFMPEG and adds functionaility for the NVMPi encoder
      * 
@@ -27,6 +27,11 @@
 
         bool ffmpeg_init(int width, int height, int fps) override {
             nvmpi_ctx_ = nvmpi_create_encoder(coding_type_,enc_param_);
+
+            FFMPEGWrapper::ffmpeg_init(width, height, fps);
+
+
+
         }
 
         void encodeFrame(const cv::Mat& image) override {
@@ -51,6 +56,13 @@
                 std::cerr << "Error getting packet\n";
             }
             std::cout << "end encodeFrame\n";
+
+            AVPacket av_packet = nv_to_av_packet(&packet);
+
+            if(av_interleaved_write_frame(format_context_, &av_packet)){
+                std::cerr << "Error writing frame to file\n";
+            }
+            av_packet_unref(&av_packet);
 
         }
 

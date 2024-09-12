@@ -162,15 +162,20 @@ public:
     }
 
 private:
-    AVFormatContext* format_context_ = nullptr;
-    AVCodecContext* codec_context_ = nullptr;
-    AVCodec* codec_ = nullptr;
+    
+
     SwsContext* sws_context_ = nullptr;
     AVFrame* frame_ = nullptr;
     uint8_t* buffer_ = nullptr;
     int width_, height_, fps_;
     int frame_index_ = 0;
+
+protected:
+
+    AVFormatContext* format_context_ = nullptr;
     std::string filename_;
+    AVCodecContext* codec_context_ = nullptr;
+    AVCodec* codec_ = nullptr;
 };
 
 #endif // GENERAL_VIDEO_ENCODER_HPP
