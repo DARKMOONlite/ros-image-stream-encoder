@@ -1,6 +1,13 @@
 #ifndef FFMPEG_WRAPPER_HPP
 #define FFMPEG_WRAPPER_HPP
 
+
+#ifdef JETSON_PLATFORM
+    #include nvmpi.h
+#endif
+
+
+
 extern "C"{ // this links to the C library
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -52,7 +59,7 @@ public:
         
     }
 
-    bool ffmpeg_init( int width, int height, int fps){ // this should be got when the first frame is received and things like width and height can be determined.
+    virtual bool ffmpeg_init( int width, int height, int fps){ // this should be got when the first frame is received and things like width and height can be determined.
         width_ = width;
         height_ = height;
         fps_ = fps;
@@ -109,7 +116,7 @@ public:
 
     }
 
-    void encodeFrame(const cv::Mat& image) {
+    virtual void encodeFrame(const cv::Mat& image) {
 
 
         if (image.empty()) {
