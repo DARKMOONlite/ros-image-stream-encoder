@@ -30,6 +30,7 @@
         }
 
         void encodeFrame(const cv::Mat& image) override {
+            std::cout << "encodeFrame\n";
             // convert image to nvFrame
             nvFrame frame;
             frame.width = image.cols;
@@ -49,6 +50,7 @@
             if(nvmpi_encoder_get_packet(nvmpi_ctx_,&packet) < 0){
                 std::cerr << "Error getting packet\n";
             }
+            std::cout << "end encodeFrame\n";
 
         }
 
