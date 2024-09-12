@@ -4,8 +4,8 @@
 #ifdef JETSON_PLATFORM
 
 
-    #include <nvmpi.h>
-    #include <ffmpeg_wrapper.hpp>
+#include "nvmpi.h"
+#include <ffmpeg_wrapper.hpp>
 
     /**
      * @brief This class completely overrides the regular FFMPEG and adds functionaility for the NVMPi encoder
@@ -33,7 +33,7 @@
             nvFrame frame;
             frame.width = image.cols;
             frame.height = image.rows;
-            frame.type = NV_PIX_FMT_BGR24;
+            frame.type = NV_PIX_YUV420;
             frame.timestamp = 0;
             frame.flags = 0;
             frame.payload_size[0] = image.cols * image.rows * 3;
