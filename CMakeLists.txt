@@ -169,6 +169,36 @@ set_target_properties(image_stream_encoder_nodelet PROPERTIES LINKER_LANGUAGE CX
 
 
 
+
+# ----------------- NVMPI WRAPPER FOR JETSON -----------------
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+  add_library(nvmpi_wrapper
+    lib/nvmpi/nvmpi_enc.cpp
+    lib/nvmpi/nvmpi_dec.cpp)
+
+  target_include_directories(nvmpi_wrapper PUBLIC
+    ${OpenCV_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
+    /usr/src/jetson_multimedia_api/include
+
+    include)
+
+  target_link_libraries(nvmpi_wrapper
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    PkgConfig::LIBAV
+  )
+  set_target_properties(nvmpi_wrapper PROPERTIES LINKER_LANGUAGE CXX)
+endif()
+
+
+
+
+
+
+
+
+
   add_executable(image_stream_encoder_node src/image_stream_encoder.cpp)
   target_include_directories(image_stream_encoder_node PUBLIC
     ${OpenCV_INCLUDE_DIRS}
