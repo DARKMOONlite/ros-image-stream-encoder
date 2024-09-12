@@ -2,9 +2,6 @@
 #define FFMPEG_WRAPPER_HPP
 
 
-#ifdef JETSON_PLATFORM
-    #include nvmpi.h
-#endif
 
 
 
