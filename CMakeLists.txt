@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(image_stream_encoder)
 
+
+set(CMAKE_C_FLAGS“$ {CMAKE_C_FLAGS} -fPIC”)
+set(CMAKE_CXX_FLAGS“$ {CMAKE_CXX_FLAGS} -fPIC”)
+#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link=/lib")
+#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link=/usr/lib/aarch64-linux-gnu")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link=/usr/lib/aarch64-linux-gnu/tegra")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link=/usr/local/cuda/lib64")
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
@@ -176,15 +183,23 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aar
 
   add_definitions(-DJETSON_PLATFORM)
 
-  add_library(nvmpi_wrapper
-    lib/nvmpi/nvmpi.h
-    lib/nvmpi/nvmpi_enc.cpp
-    lib/nvmpi/nvmpi_dec.cpp)
+  add_library(nvmpi_wrapper SHARED
+    "lib/nvmpi/nvmpi.h"
+    "lib/nvmpi/nvmpi_enc.cpp"
+    "lib/nvmpi/nvmpi_dec.cpp"
+    "/usr/src/jetson_multimedia_api/samples/common/classes/NvBuffer.cpp"
+    "/usr/src/jetson_multimedia_api/samples/common/classes/NvElement.cpp"
+    "/usr/src/jetson_multimedia_api/samples/common/classes/NvElementProfiler.cpp"
+    "/usr/src/jetson_multimedia_api/samples/common/classes/NvLogging.cpp"
+    "/usr/src/jetson_multimedia_api/samples/common/classes/NvV4l2Element.cpp"
+    "/usr/src/jetson_multimedia_api/samples/common/classes/NvV4l2ElementPlane.cpp"
+    "/usr/src/jetson_multimedia_api/samples/common/classes/NvVideoDecoder.cpp"
+    "/usr/src/jetson_multimedia_api/samples/common/classes/NvVideoEncoder.cpp"
+    )
 
   target_include_directories(nvmpi_wrapper PUBLIC
-    ${OpenCV_INCLUDE_DIRS}
-    ${catkin_INCLUDE_DIRS}
     /usr/src/jetson_multimedia_api/include
+    /usr/local/cuda/include
     include)
 
   target_link_libraries(nvmpi_wrapper PUBLIC
@@ -197,9 +212,9 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aar
   target_link_libraries(image_stream_encoder
     nvmpi_wrapper
   )
-  target_include_directories(image_stream_encoder PUBLIC
-    /usr/src/jetson_multimedia_api/include
-  )
+  # target_include_directories(image_stream_encoder PUBLIC
+  #   /usr/src/jetson_multimedia_api/include
+  # )
 
 endif()
 
