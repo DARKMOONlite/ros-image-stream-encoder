@@ -185,10 +185,9 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aar
     ${OpenCV_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     /usr/src/jetson_multimedia_api/include
-
     include)
 
-  target_link_libraries(nvmpi_wrapper
+  target_link_libraries(nvmpi_wrapper PUBLIC
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
     PkgConfig::LIBAV
@@ -197,6 +196,9 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aar
 
   target_link_libraries(image_stream_encoder
     nvmpi_wrapper
+  )
+  target_include_directories(image_stream_encoder PUBLIC
+    /usr/src/jetson_multimedia_api/include
   )
 
 endif()
