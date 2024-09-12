@@ -128,12 +128,42 @@ catkin_package(
 ## Build ##
 ###########
 
+# ----------------- NVMPI WRAPPER FOR JETSON -----------------
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+
+  add_definitions(-DJETSON_PLATFORM)
+
+  add_library(nvmpi_wrapper
+    lib/nvmpi/nvmpi_enc.cpp
+    lib/nvmpi/nvmpi_dec.cpp)
+
+  target_include_directories(nvmpi_wrapper PUBLIC
+    ${OpenCV_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
+    /usr/src/jetson_multimedia_api/include
+
+    include)
+
+  target_link_libraries(nvmpi_wrapper
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBS}
+    PkgConfig::LIBAV
+  )
+  set_target_properties(nvmpi_wrapper PROPERTIES LINKER_LANGUAGE CXX)
+
+  target_link_libraries(image_stream_encoder
+    nvmpi_wrapper
+  )
+
+endif()
+
+
+
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
+  ${catkin_INCLUDE_DIRS})
 
 # Declare a C++ library
 add_library(image_stream_encoder
@@ -161,35 +191,12 @@ set_target_properties(image_stream_encoder_nodelet PROPERTIES LINKER_LANGUAGE CX
    include
  )
   target_link_libraries(image_stream_encoder_nodelet
-    ${catkin_LIBRARIES}
-    ${OpenCV_LIBS}
     image_stream_encoder
-    PkgConfig::LIBAV
   )
 
 
 
 
-# ----------------- NVMPI WRAPPER FOR JETSON -----------------
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-  add_library(nvmpi_wrapper
-    lib/nvmpi/nvmpi_enc.cpp
-    lib/nvmpi/nvmpi_dec.cpp)
-
-  target_include_directories(nvmpi_wrapper PUBLIC
-    ${OpenCV_INCLUDE_DIRS}
-    ${catkin_INCLUDE_DIRS}
-    /usr/src/jetson_multimedia_api/include
-
-    include)
-
-  target_link_libraries(nvmpi_wrapper
-    ${catkin_LIBRARIES}
-    ${OpenCV_LIBS}
-    PkgConfig::LIBAV
-  )
-  set_target_properties(nvmpi_wrapper PROPERTIES LINKER_LANGUAGE CXX)
-endif()
 
 
 
