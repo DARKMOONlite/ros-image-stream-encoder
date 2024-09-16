@@ -17,7 +17,7 @@ public:
     FFMPEGWrapper(const std::string& filename, AVCodecID codec_id)
     : filename_(filename){
         std::cout << "constructing FFMpeg object \n";
-        av_register_all();
+        // av_register_all();
 
         // Set up output format and codec
         avformat_alloc_output_context2(&format_context_, nullptr, "mp4", filename.c_str());
