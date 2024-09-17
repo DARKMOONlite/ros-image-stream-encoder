@@ -1,5 +1,5 @@
 # ros1-image-stream-encoder
-a simple ros Noetic package that allows you to convert an image stream to various media files/outputs using ffmpeg. This was for use on a jetson nano for storing multiple image streams to the disk
+a simple ros Noetic package that allows you to convert an image topic to various media files/outputs using the `ffmpeg` library and hardware acceleration. This was designed for use on a jetson nano for storing multiple image streams to the disk.
 
 ### Tested on:
 - `Ubuntu: 20.04`
