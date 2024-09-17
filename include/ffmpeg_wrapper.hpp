@@ -1,10 +1,6 @@
 #ifndef FFMPEG_WRAPPER_HPP
 #define FFMPEG_WRAPPER_HPP
 
-
-
-
-
 extern "C"{ // this links to the C library
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -30,11 +26,11 @@ public:
             exit(1);
         }
 
-        codec_ = avcodec_find_encoder(codec_id); 
-        // codec_ = avcodec_find_encoder_by_name("h264_nvmpi");
+        // codec_ = avcodec_find_encoder(codec_id); 
+        codec_ = avcodec_find_encoder_by_name("h264_nvmpi"); 
         std::cout << "selected codec id: " << codec_->id << "\n";
         if (!codec_) {
-            std::cerr << "codec not found\n";
+            std::cerr << "H.264 codec not found\n";
             exit(1);
         }
 
@@ -56,7 +52,7 @@ public:
         
     }
 
-    virtual bool ffmpeg_init( int width, int height, int fps){ // this should be got when the first frame is received and things like width and height can be determined.
+    bool ffmpeg_init( int width, int height, int fps){ // this should be got when the first frame is received and things like width and height can be determined.
         width_ = width;
         height_ = height;
         fps_ = fps;
@@ -113,7 +109,7 @@ public:
 
     }
 
-    virtual void encodeFrame(const cv::Mat& image) {
+    void encodeFrame(const cv::Mat& image) {
 
 
         if (image.empty()) {
@@ -162,20 +158,15 @@ public:
     }
 
 private:
-    
-
+    AVFormatContext* format_context_ = nullptr;
+    AVCodecContext* codec_context_ = nullptr;
+    const AVCodec* codec_;
     SwsContext* sws_context_ = nullptr;
     AVFrame* frame_ = nullptr;
     uint8_t* buffer_ = nullptr;
     int width_, height_, fps_;
     int frame_index_ = 0;
-
-protected:
-
-    AVFormatContext* format_context_ = nullptr;
     std::string filename_;
-    AVCodecContext* codec_context_ = nullptr;
-    AVCodec* codec_ = nullptr;
 };
 
 #endif // GENERAL_VIDEO_ENCODER_HPP
