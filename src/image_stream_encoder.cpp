@@ -24,7 +24,6 @@ ImageStreamEncoder::ImageStreamEncoder() {
         ROS_INFO("No output_prepend, file name defaulting to %s", output_file.str().c_str());
         
     }
-    ROS_INFO("test2");
     std::stringstream temp;
     temp << output_prepend << output_file.str() << video_format;
     full_filename = temp.str();
@@ -81,7 +80,7 @@ ImageStreamEncoder::ImageStreamEncoder() {
 
     // ------------------------ AV LIBRARIES ------------------------
     ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, video_encoder);
-
+    ROS_INFO("%s node initialized", ros::this_node::getName().c_str());
 
 }
 
