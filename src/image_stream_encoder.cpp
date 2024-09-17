@@ -16,7 +16,7 @@ ImageStreamEncoder::ImageStreamEncoder() {
         auto tm = *std::localtime(&t);
         output_file << std::put_time(&tm, "%Y_%m_%d_%H_%M_%S"); 
     }
-    if(!nh.getParam("video_format", video_format)){
+    if(!nh.getParam("video/format", video_format)){
         ROS_WARN("No output_file parameter found, defaulting format to .mp4");
         video_format = ".mp4";
     }
@@ -36,15 +36,11 @@ ImageStreamEncoder::ImageStreamEncoder() {
     //     batch_processing_ = false;
     // }
 
-    if(!nh.getParam("batch_period", batch_period_)){
+    if(!nh.getParam("batch/period", batch_period_)){
         ROS_INFO("No batch_period parameter found, defaulting to 2 seconds");
         batch_period_ = 2;
     }
-    if(!nh.getParam("input_stream", input_stream_string_)){
-        ROS_WARN("No input_stream parameter found, defaulting to image_stream");
-        input_stream_string_ = "/image_stream";
-    }
-    if(!nh.getParam("batch_size", batch_size_)){
+    if(!nh.getParam("batch/size", batch_size_)){
         ROS_INFO("No batch_size parameter found, defaulting to 0");
         batch_size_ = 0;
     }
@@ -52,12 +48,19 @@ ImageStreamEncoder::ImageStreamEncoder() {
         batch_processing_ = true;
         ROS_INFO("Batch processing enabled");
     }
-
-
+    if(!nh.getParam("input_stream/topic", input_stream_string_)){
+        ROS_WARN("No input_stream parameter found, defaulting to image_stream");
+        input_stream_string_ = "/image_stream";
+    }
+    std::string video_encoder;
+    if(!nh.getParam("video/encoder", video_encoder)){
+        ROS_WARN("No video_encoder parameter found, defaulting to  h264_nvenc");
+        video_encoder = "h264_nvenc";
+    }
     // ------------------------- SUBSCRIBER -------------------------
 
     if(batch_processing_){
-        image_stream = std::make_unique<ros::Subscriber>(nh.subscribe<sensor_msgs::Image>("image_stream", 10, [this](sensor_msgs::Image::ConstPtr image_msg){
+        image_stream = std::make_unique<ros::Subscriber>(nh.subscribe<sensor_msgs::Image>(input_stream_string_, 10, [this](sensor_msgs::Image::ConstPtr image_msg){
             this->image_callback(image_msg);
         }));
 
@@ -77,13 +80,9 @@ ImageStreamEncoder::ImageStreamEncoder() {
 
 
     // ------------------------ AV LIBRARIES ------------------------
-    ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, AV_CODEC_ID_H264);
+    ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, video_encoder);
 
-    // #ifdef JETSON_PLATFORM
-    //     ffmpeg_wrapper_ = std::make_shared<FFMPEGNVMPIWrapper>(full_filename, AV_CODEC_ID_H264);
-    // #else
-    //     ffmpeg_wrapper_ = std::make_shared<FFMPEGWrapper>(full_filename, AV_CODEC_ID_H264);
-    // #endif
+
 }
 
 ImageStreamEncoder::~ImageStreamEncoder() {

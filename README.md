@@ -139,14 +139,14 @@ The current example uses the `usb_cam` package to quickly create an image feed, 
 ```bash
     roslaunch image_stream_encoder example.launch
 ```
-- note: *you will have to have a usb webcam attached and install the usb-cam package via the following line `sudo apt install ros-${ROS_DISTRO}-usb-cam`*
+- note: *you will have to have a usb webcam attached and install the usb-cam package via the following line `sudo apt install ros-${ROS_DISTRO}-usb-cam ros-${ROS_DISTRO}-image-view`*
 
-
+## Supported Codecies / Encoders
+- By default, all are available to work with, you can find a list of them by running `ffmpeg -codecs` or `ffmpeg -encoders`
 
 ## Common Errors:
 
-#### Relocation Against Symbol
-
+#### FFMPEG Relocation Against Symbol
 ```bash
 /usr/bin/ld: /usr/local/lib/libavutil.a(tx_float_neon.o): relocation R_AARCH64_ADR_PREL_PG_HI21 against symbol `ff_tx_tab_2048_float' which may bind externally can not be used when making a shared object; recompile with -fPIC
 

@@ -14,7 +14,7 @@ extern "C"{ // this links to the C library
 
 class FFMPEGWrapper {
 public:
-    FFMPEGWrapper(const std::string& filename, AVCodecID codec_id)
+    FFMPEGWrapper(const std::string& filename, std::string encoder_name)
     : filename_(filename){
         std::cout << "constructing FFMpeg object \n";
         // av_register_all();
@@ -27,13 +27,13 @@ public:
         }
 
         // codec_ = avcodec_find_encoder(codec_id); 
-        codec_ = avcodec_find_encoder_by_name("h264_nvmpi"); 
-        std::cout << "selected codec id: " << codec_->id << "\n";
+        codec_ = avcodec_find_encoder_by_name(encoder_name.c_str()); 
+
         if (!codec_) {
-            std::cerr << "H.264 codec not found\n";
+            std::cerr << encoder_name << " encoder not found\n";
             exit(1);
         }
-
+        
         codec_context_ = avcodec_alloc_context3(codec_);
 
 
@@ -62,9 +62,16 @@ public:
         codec_context_->pix_fmt = AV_PIX_FMT_YUV420P;
         codec_context_->time_base =  {1,fps_*1000}; //{1, fps_};
         codec_context_->framerate = {fps_, 1};
+        codec_context_->bit_rate = 400000;
+        codec_context_->gop_size = 10;
+        codec_context_->max_b_frames = 1;
+
 
         // ------------------------------------------------ Open codec ------------------------------------------------
         if (avcodec_open2(codec_context_, codec_, nullptr) < 0) {
+            char error_buf[AV_ERROR_MAX_STRING_SIZE];
+            av_strerror(avcodec_open2(codec_context_, codec_, nullptr), error_buf, sizeof(error_buf));
+            fprintf(stderr, "Could not open codec: %s\n", error_buf);
             std::cerr << "Could not open codec\n";
             return(false);
         }

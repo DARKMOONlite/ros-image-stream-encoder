@@ -5,7 +5,7 @@
 #include <sensor_msgs/Image.h>
 #include <ros/timer.h>
 #include <ffmpeg_wrapper.hpp>
-#include <ffmpeg_nvmpi_wrapper.hpp>
+
 
 class ImageStreamEncoder {
     public:

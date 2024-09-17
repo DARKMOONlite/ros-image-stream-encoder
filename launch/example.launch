@@ -2,12 +2,11 @@
 <launch>
 
     <include file="$(find usb_cam)/launch/usb_cam-test.launch"/>
+
     
 
     <node name="image_stream_encoder" pkg="image_stream_encoder" type="image_stream_encoder_node" output="screen">
-        <param name="video_format" value=".mp4"/>
-        <param name="output_prepend" value="test"/>
-        <param name="input_stream" value="/usb_cam/image_raw"/>
+        <rosparam command="load" file="$(find image_stream_encoder)/config/config.yaml"/>
     </node>
     
 
