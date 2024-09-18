@@ -76,7 +76,8 @@ This Section uses a patched version of FFMpeg created by [jocover](https://githu
   --enable-nvmpi \
   --enable-nvv4l2dec \
   --extra-libs="-L/usr/lib/aarch64-linux-gnu/tegra -lnvbuf_utils" \
-  --extra-cflags="-I /usr/src/jetson_multimedia_api/include/"
+  --extra-cflags="-I /usr/src/jetson_multimedia_api/include/" \
+  --enable-shared
 
     # build
     make -j$(nproc)
