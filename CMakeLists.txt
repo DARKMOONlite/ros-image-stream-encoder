@@ -170,61 +170,6 @@ set_target_properties(image_stream_encoder_nodelet PROPERTIES LINKER_LANGUAGE CX
 
 
 
-
-
-
-# ----------------- NVMPI WRAPPER FOR JETSON -----------------
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm.*" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-
-  add_definitions(-DJETSON_PLATFORM)
-
-  # add_library(nvmpi_wrapper SHARED
-  #   "lib/nvmpi/nvmpi.h"
-  #   "lib/nvmpi/nvmpi_enc.cpp"
-  #   "lib/nvmpi/nvmpi_dec.cpp"
-  #   "/usr/src/jetson_multimedia_api/samples/common/classes/NvBuffer.cpp"
-  #   "/usr/src/jetson_multimedia_api/samples/common/classes/NvElement.cpp"
-  #   "/usr/src/jetson_multimedia_api/samples/common/classes/NvElementProfiler.cpp"
-  #   "/usr/src/jetson_multimedia_api/samples/common/classes/NvLogging.cpp"
-  #   "/usr/src/jetson_multimedia_api/samples/common/classes/NvV4l2Element.cpp"
-  #   "/usr/src/jetson_multimedia_api/samples/common/classes/NvV4l2ElementPlane.cpp"
-  #   "/usr/src/jetson_multimedia_api/samples/common/classes/NvVideoDecoder.cpp"
-  #   "/usr/src/jetson_multimedia_api/samples/common/classes/NvVideoEncoder.cpp"
-  #   )
-
-  # target_include_directories(nvmpi_wrapper PUBLIC
-  #   /usr/src/jetson_multimedia_api/include
-  #   /usr/local/cuda/include
-  #   include)
-
-  # target_link_libraries(nvmpi_wrapper PUBLIC
-  #   ${catkin_LIBRARIES}
-  #   ${OpenCV_LIBS}
-  #   PkgConfig::LIBAV
-  # )
-  # set_target_properties(nvmpi_wrapper PROPERTIES LINKER_LANGUAGE CXX)
-
-  # target_link_libraries(image_stream_encoder
-  #   nvmpi_wrapper
-  # )
-  # # target_include_directories(image_stream_encoder PUBLIC
-  # #   /usr/src/jetson_multimedia_api/include
-  # # )
-  add_subdirectory(lib/nvmpi)
-
-  target_link_libraries(image_stream_encoder
-    nvmpi
-  )
-
-
-endif()
-
-
-
-
-
-
-
   add_executable(image_stream_encoder_node src/image_stream_encoder.cpp)
   target_include_directories(image_stream_encoder_node PUBLIC
     ${OpenCV_INCLUDE_DIRS}
