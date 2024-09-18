@@ -3,7 +3,7 @@ project(image_stream_encoder)
 
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a") # This is to fix the issue with finding the libav libraries on the Jetson
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
