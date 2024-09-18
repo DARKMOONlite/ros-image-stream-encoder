@@ -1,10 +1,6 @@
 #ifndef FFMPEG_WRAPPER_HPP
 #define FFMPEG_WRAPPER_HPP
 
-
-
-
-
 extern "C"{ // this links to the C library
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -18,10 +14,10 @@ extern "C"{ // this links to the C library
 
 class FFMPEGWrapper {
 public:
-    FFMPEGWrapper(const std::string& filename, AVCodecID codec_id)
+    FFMPEGWrapper(const std::string& filename, std::string encoder_name)
     : filename_(filename){
         std::cout << "constructing FFMpeg object \n";
-        av_register_all();
+        // av_register_all();
 
         // Set up output format and codec
         avformat_alloc_output_context2(&format_context_, nullptr, "mp4", filename.c_str());
@@ -30,14 +26,14 @@ public:
             exit(1);
         }
 
-        codec_ = avcodec_find_encoder(codec_id); 
-        // codec_ = avcodec_find_encoder_by_name("h264_nvmpi");
-        std::cout << "selected codec id: " << codec_->id << "\n";
+        // codec_ = avcodec_find_encoder(codec_id); 
+        codec_ = avcodec_find_encoder_by_name(encoder_name.c_str()); 
+
         if (!codec_) {
-            std::cerr << "codec not found\n";
+            std::cerr << encoder_name << " encoder not found\n";
             exit(1);
         }
-
+        
         codec_context_ = avcodec_alloc_context3(codec_);
 
 
@@ -56,7 +52,7 @@ public:
         
     }
 
-    virtual bool ffmpeg_init( int width, int height, int fps){ // this should be got when the first frame is received and things like width and height can be determined.
+    bool ffmpeg_init( int width, int height, int fps){ // this should be got when the first frame is received and things like width and height can be determined.
         width_ = width;
         height_ = height;
         fps_ = fps;
@@ -66,9 +62,16 @@ public:
         codec_context_->pix_fmt = AV_PIX_FMT_YUV420P;
         codec_context_->time_base =  {1,fps_*1000}; //{1, fps_};
         codec_context_->framerate = {fps_, 1};
+        codec_context_->bit_rate = 400000;
+        codec_context_->gop_size = 10;
+        codec_context_->max_b_frames = 1;
+
 
         // ------------------------------------------------ Open codec ------------------------------------------------
         if (avcodec_open2(codec_context_, codec_, nullptr) < 0) {
+            char error_buf[AV_ERROR_MAX_STRING_SIZE];
+            av_strerror(avcodec_open2(codec_context_, codec_, nullptr), error_buf, sizeof(error_buf));
+            fprintf(stderr, "Could not open codec: %s\n", error_buf);
             std::cerr << "Could not open codec\n";
             return(false);
         }
@@ -113,7 +116,7 @@ public:
 
     }
 
-    virtual void encodeFrame(const cv::Mat& image) {
+    void encodeFrame(const cv::Mat& image) {
 
 
         if (image.empty()) {
@@ -162,20 +165,15 @@ public:
     }
 
 private:
-    
-
+    AVFormatContext* format_context_ = nullptr;
+    AVCodecContext* codec_context_ = nullptr;
+    const AVCodec* codec_;
     SwsContext* sws_context_ = nullptr;
     AVFrame* frame_ = nullptr;
     uint8_t* buffer_ = nullptr;
     int width_, height_, fps_;
     int frame_index_ = 0;
-
-protected:
-
-    AVFormatContext* format_context_ = nullptr;
     std::string filename_;
-    AVCodecContext* codec_context_ = nullptr;
-    AVCodec* codec_ = nullptr;
 };
 
 #endif // GENERAL_VIDEO_ENCODER_HPP

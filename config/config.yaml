@@ -1,3 +1,11 @@
-ffmpeg:
-  muxer:
-  
+video:
+  format: ".mp4"
+  encoder: "libx264" #"h264_nvmpi"
+batching:
+  period: 2
+  batch_size: 0
+#video_fps: 30
+input_stream:
+  topic: "/usb_cam/image_raw"
+  encoding: "rgb8"
+output_prepend: "encoded_"
