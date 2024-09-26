@@ -4,6 +4,9 @@
 #include <sstream>
 #include <cv_bridge/cv_bridge.h>
 #include <bits/stdc++.h>
+
+using namespace stream_encoder;
+
 ImageStreamEncoder::ImageStreamEncoder() {
 
     nh = ros::NodeHandle("~");
@@ -139,7 +142,7 @@ void ImageStreamEncoder::encode_image(std::vector<sensor_msgs::Image::ConstPtr> 
  * @brief 
  * 
  * @param header_stamp timestamp from the message header
- * @return double when this has only been run once, it will return -1
+ * @return double, onm the first run it will return -1 as it cannot determine the fps with only one frame
  */
 double ImageStreamEncoder::calculate_fps(ros::Time header_stamp) {
 

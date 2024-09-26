@@ -1,5 +1,3 @@
-#ifndef STREAM_ENCODER_NODELET_HPP
-#define STREAM_ENCODER_NODELET_HPP
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
 #include "image_stream_encoder.hpp"
@@ -30,4 +28,3 @@ class StreamEncoderNodelet : public nodelet::Nodelet {
 
 } // namespace stream_encoder
 PLUGINLIB_EXPORT_CLASS(stream_encoder::StreamEncoderNodelet, nodelet::Nodelet)
-#endif // STREAM_ENCODER_NODELET_HPP

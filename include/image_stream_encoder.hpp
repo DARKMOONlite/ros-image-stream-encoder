@@ -6,6 +6,7 @@
 #include <ros/timer.h>
 #include <ffmpeg_wrapper.hpp>
 
+namespace stream_encoder{
 
 class ImageStreamEncoder {
     public:
@@ -46,4 +47,8 @@ class ImageStreamEncoder {
     std::vector<sensor_msgs::Image::ConstPtr> image_buffer;
 
 };
+
+
+
+} // namespace stream_encoder
 

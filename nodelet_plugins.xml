@@ -1,9 +1,5 @@
 <library path="lib/libimage_stream_encoder_nodelet">
-    <class name="stream_encoder/StreamEncoderNodelet"
-        type="stream_encoder::StreamEncoderNodelet"
-        base_class_type="nodelet::Nodelet">
-        <description>
-            This nodelet reads a stream of ros images and encodes them into a video file.
-        </description>
+    <class name="stream_encoder/StreamEncoderNodelet" type="stream_encoder::StreamEncoderNodelet" base_class_type="nodelet::Nodelet">
+        <description>This nodelet reads a stream of ros images and encodes them into a video file.</description>
     </class>
 </library>

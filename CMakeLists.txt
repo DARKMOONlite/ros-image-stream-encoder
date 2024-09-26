@@ -154,7 +154,7 @@ target_link_libraries(image_stream_encoder
 )
 
 add_library(image_stream_encoder_nodelet
- include/stream_encoder_nodelet.hpp)
+ src/stream_encoder_nodelet.cpp)
 
 set_target_properties(image_stream_encoder_nodelet PROPERTIES LINKER_LANGUAGE CXX)
 
@@ -165,6 +165,7 @@ set_target_properties(image_stream_encoder_nodelet PROPERTIES LINKER_LANGUAGE CX
  )
   target_link_libraries(image_stream_encoder_nodelet
     image_stream_encoder
+    ${catkin_LIBRARIES}
   )
 
 
