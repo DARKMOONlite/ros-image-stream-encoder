@@ -29,16 +29,6 @@ ImageStreamEncoder::ImageStreamEncoder() {
     full_filename = temp.str();
     ROS_INFO("Output file: %s", full_filename.c_str());
     // ------------------------ BATCH PROCESSING ------------------------
-
-    // if(!nh.getParam("batch", batch_processing_)){
-    //     ROS_WARN("No batch parameter found, defaulting to false");
-    //     batch_processing_ = false;
-    // }
-
-    if(!nh.getParam("batch/period", batch_period_)){
-        ROS_INFO("No batch_period parameter found, defaulting to 2 seconds");
-        batch_period_ = 2;
-    }
     if(!nh.getParam("batch/size", batch_size_)){
         ROS_INFO("No batch_size parameter found, defaulting to 0");
         batch_size_ = 0;
@@ -46,7 +36,15 @@ ImageStreamEncoder::ImageStreamEncoder() {
     if(batch_size_ > 0){
         batch_processing_ = true;
         ROS_INFO("Batch processing enabled");
-    }
+
+
+        if(!nh.getParam("batch/period", batch_period_)){
+            ROS_INFO("No batch_period parameter found, defaulting to 2 seconds");
+            batch_period_ = 2;
+        }
+        
+    }    
+
     if(!nh.getParam("input_stream/topic", input_stream_string_)){
         ROS_WARN("No input_stream parameter found, defaulting to image_stream");
         input_stream_string_ = "/image_stream";
