@@ -42,7 +42,7 @@ ImageStreamEncoder::ImageStreamEncoder() {
             ROS_INFO("No batch_period parameter found, defaulting to 2 seconds");
             batch_period_ = 2;
         }
-        
+
     }    
 
     if(!nh.getParam("input_stream/topic", input_stream_string_)){
@@ -58,11 +58,11 @@ ImageStreamEncoder::ImageStreamEncoder() {
 
     if(batch_processing_){
         image_stream = std::make_unique<ros::Subscriber>(nh.subscribe<sensor_msgs::Image>(input_stream_string_, 10, [this](sensor_msgs::Image::ConstPtr image_msg){
-            this->image_callback(image_msg);
+            this->batch_image_callback(image_msg);
         }));
 
         timer = nh.createTimer(ros::Duration(batch_period_), [this](const ros::TimerEvent& event){
-            this->timer_callback(event);
+            this->encode_batch_timer_callback(event);
         });
 
 
@@ -87,13 +87,13 @@ ImageStreamEncoder::~ImageStreamEncoder() {
 }
 
 void ImageStreamEncoder::image_and_encode_callback(sensor_msgs::Image::ConstPtr image_msg) {
-    if(!image_callback(image_msg)){return;}
+    if(!batch_image_callback(image_msg)){return;}
     if(ffmpeg_initialized_){
         encode_image(image_msg);
     }
 }
 
-bool ImageStreamEncoder::image_callback(sensor_msgs::Image::ConstPtr image_msg) {
+bool ImageStreamEncoder::batch_image_callback(sensor_msgs::Image::ConstPtr image_msg) {
     double fps = calculate_fps(image_msg->header.stamp); //TODO find a way to allow dynamic fps changes to impact the encoding
     if(fps<0){
         return(false);
@@ -111,7 +111,7 @@ bool ImageStreamEncoder::image_callback(sensor_msgs::Image::ConstPtr image_msg) 
 
 }
 
-void ImageStreamEncoder::timer_callback(const ros::TimerEvent& event) {
+void ImageStreamEncoder::encode_batch_timer_callback(const ros::TimerEvent& event) {
     ROS_INFO("Timer Callback");
     if(image_buffer.size() > 0){
         encode_image(image_buffer);

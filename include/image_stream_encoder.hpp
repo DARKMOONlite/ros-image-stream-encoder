@@ -15,8 +15,8 @@ class ImageStreamEncoder {
     ~ImageStreamEncoder();
 
     void image_and_encode_callback(sensor_msgs::Image::ConstPtr image_msg);
-    bool image_callback(sensor_msgs::Image::ConstPtr image_msg);
-    void timer_callback(const ros::TimerEvent& event);
+    bool batch_image_callback(sensor_msgs::Image::ConstPtr image_msg);
+    void encode_batch_timer_callback(const ros::TimerEvent& event);
     void encode_image(sensor_msgs::Image::ConstPtr image_msg); //sensor_msgs::Image::ConstPtr image_msg
     void encode_image(std::vector<sensor_msgs::Image::ConstPtr> image_msgs); //sensor_msgs::Image::ConstPtr image_msg
     bool ffmpeg_init();
