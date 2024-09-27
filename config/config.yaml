@@ -1,6 +1,6 @@
 video:
   format: ".mp4"
-  encoder: "libx264" #"h264_nvmpi"
+  encoder: "mpeg4" #"h264_nvmpi"
 batching:
   period: 2
   batch_size: 0
