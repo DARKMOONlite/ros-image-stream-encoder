@@ -143,7 +143,9 @@ The current example uses the `usb_cam` package to quickly create an image feed, 
 - note: *you will have to have a usb webcam attached and install the usb-cam package via the following line `sudo apt install ros-${ROS_DISTRO}-usb-cam ros-${ROS_DISTRO}-image-view`*
 
 ## Supported Codecies / Encoders
+- Node defaults to `h264_nvenc`  which utilises the `NVENC` cores on the jetson's GPU.
 - By default, all are available to work with, you can find a list of them by running `ffmpeg -codecs` or `ffmpeg -encoders`
+
 
 ## Common Errors:
 
