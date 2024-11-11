@@ -3,16 +3,20 @@
 
     <!-- <include file="$(find usb_cam)/launch/usb_cam-test.launch"/> -->
     
-    <arg name="video_format" default=".mp4"/>
+    <arg name="video/format" default=".mp4"/>
     <arg name="output_prepend" default=""/>
-    <arg name="input_stream" default="/usb_cam/image_raw"/>
-    
-
+    <arg name="input_stream/topic" default="/usb_cam/image_raw"/>
+    <arg name="video/encoder" default="h264_nvmpi"/>    
+    <arg name="batch/size" default="0"/> <!--disabled by default -->
+    <arg name="batch/period" default="2"/>
 
     <node name="image_stream_encoder" pkg="image_stream_encoder" type="image_stream_encoder_node" output="screen">
-        <param name="video_format" value="$(arg video_format)"/>
+        <param name="video/format" value="$(arg video/format)"/>
         <param name="output_prepend" value="$(arg output_prepend)"/>
-        <param name="input_stream" value="$(arg input_stream)"/>
+        <param name="input_stream/topic" value="$(arg input_stream/topic)"/>
+        <param name="batch/size" value="$(arg batch/size)"/>
+        <param name="batch/period" value="$(arg batch/period)"/>
+        <param name="video/encoder" value="$(arg video/encoder)"/>
     </node>
     
 

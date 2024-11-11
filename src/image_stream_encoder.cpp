@@ -54,8 +54,8 @@ ImageStreamEncoder::ImageStreamEncoder() {
     }
     std::string video_encoder;
     if(!nh.getParam("video/encoder", video_encoder)){
-        ROS_WARN("No video_encoder parameter found, defaulting to  h264_nvenc");
-        video_encoder = "h264_nvenc";
+        ROS_WARN("No video_encoder parameter found, defaulting to  h264_nvmpi");
+        video_encoder = "h264_nvmpi";
     }
     // ------------------------- SUBSCRIBER -------------------------
 
@@ -63,7 +63,6 @@ ImageStreamEncoder::ImageStreamEncoder() {
         image_stream = std::make_unique<ros::Subscriber>(nh.subscribe<sensor_msgs::Image>(input_stream_string_, 10, [this](sensor_msgs::Image::ConstPtr image_msg){
             this->batch_image_callback(image_msg);
         }));
-
         timer = nh.createTimer(ros::Duration(batch_period_), [this](const ros::TimerEvent& event){
             this->encode_batch_timer_callback(event);
         });
