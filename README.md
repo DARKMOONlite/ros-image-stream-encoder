@@ -6,7 +6,8 @@ a simple ros Noetic package that allows you to convert an image topic to various
 - `ROS: Noetic`
 - `GPU: 1070ti & Jetson Nano `
 
-note : *it should work on other ros 1 versions and other linux distros without issue.*
+> [!note]
+>  *it should work on other ros 1 versions and other linux distros without issue.*
 
 
 # Install FFmpeg
